@@ -39,27 +39,6 @@ Monitor your disks.
 
 ![Disk info](https://raw.githubusercontent.com/tomaae/homeassistant-openmediavault/master/docs/assets/images/ui/disk_sensor.png)
 
-# Install integration
-This integration is distributed using [HACS](https://hacs.xyz/).
-
-You can find it under "Integrations", named "OpenMediaVault"
-
-## Setup integration
-Setup this integration for your OpenMediaVault NAS in Home Assistant via `Configuration -> Integrations -> Add -> OpenMediaVault`.
-You can add this integration several times for different devices.
-
-![Add Integration](https://raw.githubusercontent.com/tomaae/homeassistant-openmediavault/master/docs/assets/images/ui/setup_integration.png)
-* "Name of the integration" - Friendly name for this NAS
-* "Host" - Use hostname or IP
-* "Use SSL" - Connect to OMV using SSL
-* "Verify SSL certificate" - Validate SSL certificate (must be trusted certificate)
-
-# Development
-## Translation
-To help out with the translation you need an account on Lokalise, the easiest way to get one is to [click here](https://lokalise.com/login/) then select "Log in with GitHub".
-After you have created your account [click here to join OpenMediaVault project on Lokalise](https://app.lokalise.com/public/106503135ea170ab5e1f70.96389313/).
-
-If you want to add translations for a language that is not listed please [open a Feature request](https://github.com/tomaae/homeassistant-openmediavault/issues/new?labels=enhancement&title=%5BLokalise%5D%20Add%20new%20translations%20language).
 
 ## Enabling debug
 To enable debug for OpenMediaVault integration, add following to your configuration.yaml:
