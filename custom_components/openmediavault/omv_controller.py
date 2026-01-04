@@ -216,7 +216,7 @@ class OMVControllerData(object):
             vals=[
                 {"name": "hostname", "default": "unknown"},
                 {"name": "version", "default": "unknown"},
-                {"name": "cpuUsage", "default": 0.0},
+                {"name": "cpuUsage", "source": "cpuUtilization", "default": 0.0},
                 {"name": "memTotal", "default": 0},
                 {"name": "memUsed", "default": 0},
                 {"name": "loadAverage_1", "source": "loadAverage/1min", "default": 0.0},
@@ -270,14 +270,31 @@ class OMVControllerData(object):
         uptime_tm = datetime.timestamp(now - timedelta(seconds=tmp_uptime))
         self.data["hwinfo"]["uptimeEpoch"] = utc_from_timestamp(uptime_tm)
 
-        self.data["hwinfo"]["cpuUsage"] = round(self.data["hwinfo"]["cpuUsage"], 1)
-        mem = (
-            (int(self.data["hwinfo"]["memUsed"]) / int(self.data["hwinfo"]["memTotal"]))
-            * 100
-            if int(self.data["hwinfo"]["memTotal"]) > 0
-            else 0
-        )
-        self.data["hwinfo"]["memUsage"] = round(mem, 1)
+        # FIX for OMV 7: cpuUtilization is already in percentage, just round it
+        self.data["hwinfo"]["cpuUsage"] = round(float(self.data["hwinfo"]["cpuUsage"]), 1)
+        
+        # FIX for OMV 7: Try to use memUtilization from API, fallback to calculation
+        if "memUtilization" in self.data["hwinfo"] and self.data["hwinfo"]["memUtilization"]:
+            try:
+                self.data["hwinfo"]["memUsage"] = round(float(self.data["hwinfo"]["memUtilization"]), 1)
+            except (ValueError, TypeError):
+                # Fallback to calculation if memUtilization is not a valid number
+                mem = (
+                    (int(self.data["hwinfo"]["memUsed"]) / int(self.data["hwinfo"]["memTotal"]))
+                    * 100
+                    if int(self.data["hwinfo"]["memTotal"]) > 0
+                    else 0
+                )
+                self.data["hwinfo"]["memUsage"] = round(mem, 1)
+        else:
+            # Fallback calculation if memUtilization is not available
+            mem = (
+                (int(self.data["hwinfo"]["memUsed"]) / int(self.data["hwinfo"]["memTotal"]))
+                * 100
+                if int(self.data["hwinfo"]["memTotal"]) > 0
+                else 0
+            )
+            self.data["hwinfo"]["memUsage"] = round(mem, 1)
 
         self.data["hwinfo"]["pkgUpdatesAvailable"] = (
             self.data["hwinfo"]["availablePkgUpdates"] > 0
@@ -346,6 +363,11 @@ class OMVControllerData(object):
                 continue
 
             if self.data["disk"][uid]["devicename"].startswith("bcache"):
+                continue
+
+            # FIX for OMV 7: Skip USB devices as they don't support SMART queries
+            device_file = self.data["disk"][uid].get("devicefile", "")
+            if "usb" in device_file.lower():
                 continue
 
             if (
