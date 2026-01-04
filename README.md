@@ -14,7 +14,7 @@
 
 ![OpenMediaVault Logo](https://raw.githubusercontent.com/tomaae/homeassistant-openmediavault/master/docs/assets/images/ui/header.png)
 
-Monitor your OpenMediaVault 5/6 NAS from Home Assistant.
+Monitor your OpenMediaVault 7 NAS from Home Assistant.
 
 Features:
 * Filesystem usage sensors
